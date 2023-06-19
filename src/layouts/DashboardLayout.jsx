@@ -78,9 +78,7 @@ export const DashboardLayout = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                navigator.clipboard.writeText(
-                  "77b39ece-a99d-4145-86d6-c68b210747e7"
-                );
+                navigator.clipboard.writeText(code);
               }}
               className="black_btn"
             >
