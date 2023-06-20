@@ -20,8 +20,9 @@ export const DashboardLayout = () => {
 
   const navigate = useNavigate();
 
-  const { logoutUser } = useAuthStore((state) => ({
+  const { logoutUser, user } = useAuthStore((state) => ({
     logoutUser: state.logoutUser,
+    user: state.user,
   }));
 
   const fetch = async () => {
@@ -53,12 +54,12 @@ export const DashboardLayout = () => {
             Logout
           </button>
         </nav>
-        <h1 className="head_text">
-          Stay safe with <br className="max-md:hidden" />
-          <span className="orange_gradient">Hate Speech Model</span>{" "}
+        <h1 className="head_text capitalize">
+          Hello, {user?.username} <br className="max-md:hidden" />
+          <span className="orange_gradient">Watchout for your kids</span>{" "}
         </h1>
         <h2 className="desc mt-20">
-          Enhancing Online Safety and Combating Harmful Language.
+          Enhancing Online Safety and combating harmful Language and drug abuse.
         </h2>
       </header>
       <section className="mt-16 w-full max-w-xl">

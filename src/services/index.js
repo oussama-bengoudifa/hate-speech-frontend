@@ -1,4 +1,9 @@
-import { loginAdmin, refreshToken, getCode } from "./auth.service";
+import {
+  loginAdmin,
+  refreshToken,
+  getCode,
+  registerAdmin,
+} from "./auth.service";
 import {
   getBanned,
   createBanned,
@@ -14,4 +19,5 @@ export {
   updateBanned,
   deleteBanned,
   getCode,
+  registerAdmin,
 };

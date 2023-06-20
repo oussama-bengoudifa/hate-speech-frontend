@@ -16,6 +16,20 @@ export const loginAdmin = async (values) => {
   }
 };
 
+export const registerAdmin = async (values) => {
+  try {
+    const response = await axios.post(`${domain}/auth/signup`, values);
+
+    // Handle the response data here
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    // Handle any errors here
+    console.error(error);
+    return null;
+  }
+};
+
 export const refreshToken = async (refresh_token) => {
   try {
     const response = await axios.post(

@@ -7,12 +7,14 @@ export const useAuthStore = create(
       user: {
         refresh_token: "",
         access_token: "",
+        username: "",
       },
-      loginUser: (refresh_token, access_token) =>
+      loginUser: (refresh_token, access_token, username) =>
         set(() => ({
           user: {
             refresh_token,
             access_token,
+            username,
           },
         })),
       logoutUser: () =>
@@ -20,6 +22,7 @@ export const useAuthStore = create(
           user: {
             refresh_token: "",
             access_token: "",
+            username: "",
           },
         })),
       updateToken: (access_token) =>

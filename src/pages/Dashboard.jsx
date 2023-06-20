@@ -1,9 +1,3 @@
-//mantine
-import { AppShell, Navbar } from "@mantine/core";
-
-//components
-import { Sidebar } from "../components";
-
 //layouts
 import { DashboardLayout } from "../layouts";
 

@@ -9,7 +9,7 @@ import { useForm } from "@mantine/form";
 import { useAuth } from "../hooks";
 
 //services
-import { loginAdmin } from "../services";
+import { registerAdmin } from "../services";
 
 //store
 import { useAuthStore } from "../store";
@@ -29,23 +29,24 @@ export const Login = () => {
   const form = useForm({
     initialValues: {
       email: "",
+      username: "",
       password: "",
     },
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       password: (value) => (value === "" ? "Password required" : null),
+      username: (value) => (value === "" ? "Username required" : null),
     },
   });
 
   const signin = async (values) => {
     setLoading(true);
-    const response = await loginAdmin(values);
-    console.log(response);
+    const response = await registerAdmin(values);
     if (!response) {
       form.setFieldError("email", "wrong credentials");
     }
-    loginUser(response.refresh_token, response.access_token);
+    loginUser(response.refresh_token, response.access_token, values.username);
     setLoading(false);
     navigate("/dashboard");
   };
@@ -95,6 +96,23 @@ export const Login = () => {
                     size="xs"
                     withAsterisk
                     {...form.getInputProps("email")}
+                    sx={{
+                      input: {
+                        fontSize: "12px",
+                        height: "36px",
+                        fontFamily: "Mulish, sans-serif",
+                        border: "1px solid #D8D8D8",
+                        background: "#F8F8F8",
+                        borderRadius: "4px",
+                      },
+                    }}
+                  />
+                  <TextInput
+                    label="Username"
+                    placeholder="Please enter your username"
+                    size="xs"
+                    withAsterisk
+                    {...form.getInputProps("username")}
                     sx={{
                       input: {
                         fontSize: "12px",
