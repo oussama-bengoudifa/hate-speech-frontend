@@ -2,20 +2,27 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 //mantine
-import { TextInput, PasswordInput, Loader } from "@mantine/core";
+import {
+  TextInput,
+  PasswordInput,
+  Loader,
+  Modal,
+  PinInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import { useDisclosure } from "@mantine/hooks";
 
 //hooks
 import { useAuth } from "../hooks";
 
 //services
-import { registerAdmin } from "../services";
+import { forgetPassword, resetPassword } from "../services";
 
 //store
 import { useAuthStore } from "../store";
 
-export const Login = () => {
+export const ForgetPassword = () => {
   const token = useAuth();
 
   const { loginUser } = useAuthStore((state) => ({
@@ -24,42 +31,73 @@ export const Login = () => {
 
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
+  const [loadingReset, setLoadingReset] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
 
   //form
   const form = useForm({
     initialValues: {
       email: "",
-      password: "",
-      username: "",
     },
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: (value) => (value === "" ? "Password required" : null),
-      username: (value) => (value === "" ? "Username required" : null),
     },
   });
 
+  const formReset = useForm({
+    initialValues: {
+      password: "",
+      code: "",
+    },
+
+    validate: {
+      code: (value) => (value === "" ? "Code required" : null),
+      password: (value) => (value === "" ? "Password required" : null),
+    },
+  });
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [codeValue, setCodeValue] = React.useState(null);
+
   const signin = async (values) => {
     setLoading(true);
-    const response = await registerAdmin(values);
-
+    const response = await forgetPassword(values);
+    console.log(response);
     if (!response) {
-      setLoading(false);
+      form.setFieldError("email", "User not found");
+    }
 
-      return form.setFieldError("email", "Wrong credentials");
+    open();
+
+    setLoading(false);
+  };
+
+  const handleResetPassword = async () => {
+    const email = form.values.email;
+    setLoadingReset(true);
+    const response = await resetPassword({
+      email,
+      code: codeValue,
+      newPassword: formReset.values.password,
+    });
+    if (!response) {
+      setLoadingReset(false);
+
+      return notifications.show({
+        title: "Error",
+        message: "Wrong Code or was expired,try again submit email",
+        color: "red",
+      });
     }
 
     notifications.show({
       title: "Success",
-      message: "Your account was created successfully",
+      message: "Your password was been updated successfully",
       color: "green",
       onClose: () => navigate("/login"),
-      autoClose: 2000,
+      autoClose: () => navigate("/login"),
     });
-
-    setLoading(false);
   };
 
   React.useEffect(() => {
@@ -84,6 +122,57 @@ export const Login = () => {
       <div className="main">
         <div className="gradient" />
       </div>
+      <Modal opened={opened} onClose={close} title="Reset Password Form">
+        <div className="flex flex-col  gap-4 py-6">
+          <span className="text-sm text-black  mt-4 underline underline-offset-4 ">
+            Please enter the code and new password to reset it
+          </span>
+          <form
+            onSubmit={formReset.onSubmit((values) =>
+              handleResetPassword(values)
+            )}
+            className="flex flex-col gap-3 min-w-[350px] mt-6"
+          >
+            <div className="flex flex-col gap-1">
+              <span className="font-mulish text-xs font-bold text-[#3F3D56] mt-5">
+                Code
+              </span>
+              <PinInput
+                onChange={(e) => setCodeValue(e)}
+                length={6}
+                type="alphanumeric"
+              />
+            </div>
+            <PasswordInput
+              placeholder="Enter your new password"
+              label="New Password"
+              {...formReset.getInputProps("password")}
+              className="password-input"
+              sx={{
+                input: {
+                  fontSize: "12px",
+                  height: "36px",
+                  fontFamily: "Mulish, sans-serif",
+                  borderRadius: "4px",
+                },
+                label: {
+                  fontSize: "12px",
+                },
+              }}
+            />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleResetPassword();
+              }}
+              type="submit"
+              className="w-full rounded-[4px] bg-primary mt-4 duration-300 hover:bg-primaryDark text-white text-sm flex justify-center items-center h-10"
+            >
+              {loadingReset ? "Loading ..." : "Submit"}
+            </button>
+          </form>
+        </div>
+      </Modal>
       <div className="app">
         <div className="w-full h-screen">
           <div className="flex h-full relative z-20">
@@ -95,10 +184,10 @@ export const Login = () => {
                   className="w-10 h-10 object-contain"
                 />
                 <span className="font-mulish text-xl font-bold text-[#3F3D56] mt-5">
-                  Signup
+                  Reset password
                 </span>
                 <span className="text-xs text-secondary font-light mt-2">
-                  Please fill bellow to create your account
+                  Please enter your email
                 </span>
                 <form
                   onSubmit={form.onSubmit((values) => signin(values))}
@@ -121,46 +210,11 @@ export const Login = () => {
                       },
                     }}
                   />
-                  <TextInput
-                    label="Username"
-                    placeholder="Please enter your username"
-                    size="xs"
-                    withAsterisk
-                    {...form.getInputProps("username")}
-                    sx={{
-                      input: {
-                        fontSize: "12px",
-                        height: "36px",
-                        fontFamily: "Mulish, sans-serif",
-                        border: "1px solid #D8D8D8",
-                        background: "#F8F8F8",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  />
-                  <PasswordInput
-                    placeholder="Enter password"
-                    label="Password"
-                    withAsterisk
-                    {...form.getInputProps("password")}
-                    className="password-input"
-                    sx={{
-                      input: {
-                        fontSize: "12px",
-                        height: "36px",
-                        fontFamily: "Mulish, sans-serif",
-                        borderRadius: "4px",
-                      },
-                      label: {
-                        fontSize: "12px",
-                      },
-                    }}
-                  />
 
                   <span className="text-xs text-black font-light mt-2">
-                    already have an account login{" "}
+                    Go back to login{" "}
                     <Link to="/login" className="font-bold text-primary">
-                      here
+                      click here
                     </Link>
                   </span>
                   <button

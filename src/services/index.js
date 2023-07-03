@@ -3,6 +3,8 @@ import {
   refreshToken,
   getCode,
   registerAdmin,
+  forgetPassword,
+  resetPassword,
 } from "./auth.service";
 import {
   getBanned,
@@ -20,4 +22,6 @@ export {
   deleteBanned,
   getCode,
   registerAdmin,
+  forgetPassword,
+  resetPassword,
 };

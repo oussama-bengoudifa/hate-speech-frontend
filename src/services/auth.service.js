@@ -69,3 +69,31 @@ export const getCode = async (token) => {
     return null;
   }
 };
+
+export const forgetPassword = async (values) => {
+  try {
+    const response = await axios.post(`${domain}/auth/forget-password`, values);
+
+    // Handle the response data here
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    // Handle any errors here
+    console.error(error);
+    return null;
+  }
+};
+
+export const resetPassword = async (values) => {
+  try {
+    const response = await axios.post(`${domain}/auth/reset-password`, values);
+
+    // Handle the response data here
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    // Handle any errors here
+    console.error(error);
+    return null;
+  }
+};

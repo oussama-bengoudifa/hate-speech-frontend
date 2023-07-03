@@ -10,12 +10,12 @@ import { notifications } from "@mantine/notifications";
 import { useAuth } from "../hooks";
 
 //services
-import { registerAdmin } from "../services";
+import { loginAdmin } from "../services";
 
 //store
 import { useAuthStore } from "../store";
 
-export const Login = () => {
+export const LoginNew = () => {
   const token = useAuth();
 
   const { loginUser } = useAuthStore((state) => ({
@@ -31,35 +31,28 @@ export const Login = () => {
     initialValues: {
       email: "",
       password: "",
-      username: "",
     },
 
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       password: (value) => (value === "" ? "Password required" : null),
-      username: (value) => (value === "" ? "Username required" : null),
     },
   });
 
   const signin = async (values) => {
     setLoading(true);
-    const response = await registerAdmin(values);
-
+    const response = await loginAdmin(values);
     if (!response) {
       setLoading(false);
 
       return form.setFieldError("email", "Wrong credentials");
     }
 
-    notifications.show({
-      title: "Success",
-      message: "Your account was created successfully",
-      color: "green",
-      onClose: () => navigate("/login"),
-      autoClose: 2000,
-    });
+    loginUser(response.refresh_token, response.access_token, "User");
 
     setLoading(false);
+
+    navigate("/dashboard");
   };
 
   React.useEffect(() => {
@@ -95,10 +88,10 @@ export const Login = () => {
                   className="w-10 h-10 object-contain"
                 />
                 <span className="font-mulish text-xl font-bold text-[#3F3D56] mt-5">
-                  Signup
+                  Login
                 </span>
                 <span className="text-xs text-secondary font-light mt-2">
-                  Please fill bellow to create your account
+                  Please fill bellow to get your mobile authentication key
                 </span>
                 <form
                   onSubmit={form.onSubmit((values) => signin(values))}
@@ -121,7 +114,7 @@ export const Login = () => {
                       },
                     }}
                   />
-                  <TextInput
+                  {/*    <TextInput
                     label="Username"
                     placeholder="Please enter your username"
                     size="xs"
@@ -137,7 +130,7 @@ export const Login = () => {
                         borderRadius: "4px",
                       },
                     }}
-                  />
+                  /> */}
                   <PasswordInput
                     placeholder="Enter password"
                     label="Password"
@@ -156,10 +149,9 @@ export const Login = () => {
                       },
                     }}
                   />
-
                   <span className="text-xs text-black font-light mt-2">
-                    already have an account login{" "}
-                    <Link to="/login" className="font-bold text-primary">
+                    {"don't"} have an account sign up{" "}
+                    <Link to="/register" className="font-bold text-primary">
                       here
                     </Link>
                   </span>
@@ -169,6 +161,15 @@ export const Login = () => {
                   >
                     {loading ? "Loading ..." : "Confirm"}
                   </button>
+                  <span className="text-xs text-black font-light mt-2">
+                    {"don't"} Did forget you password?{" "}
+                    <Link
+                      to="/forget-password"
+                      className="font-bold text-primary"
+                    >
+                      click here
+                    </Link>
+                  </span>
                 </form>
               </div>
             </div>

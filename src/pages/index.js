@@ -1,4 +1,7 @@
 import { Login } from "./Login";
-import { Dashboard } from "./Dashboard";
+import { LoginNew } from "./LoginNew";
 
-export { Login, Dashboard };
+import { Dashboard } from "./Dashboard";
+import { ForgetPassword } from "./ForgetPassword";
+
+export { Login, Dashboard, LoginNew, ForgetPassword };
