@@ -42,13 +42,18 @@ export const LoginNew = () => {
   const signin = async (values) => {
     setLoading(true);
     const response = await loginAdmin(values);
+    console.log(response);
     if (!response) {
       setLoading(false);
 
       return form.setFieldError("email", "Wrong credentials");
     }
 
-    loginUser(response.refresh_token, response.access_token, "User");
+    loginUser(
+      response.token.refresh_token,
+      response.token.access_token,
+      response.username
+    );
 
     setLoading(false);
 
